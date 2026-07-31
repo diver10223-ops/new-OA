@@ -64,3 +64,6 @@ JWT 仅用于身份传递，最终权限由服务端角色/菜单/数据范围�
 4. **立项闭环**：复用审批能力，增加多节点、项目管理复核和查询。
 5. **平台完善**：组织权限管理、通知、可观测性、Redis（按需）、端到端测试。
 6. **智能能力**：只读助手开始，逐步引入需人工确认的写 Skill 与 MCP 适配。
+
+## 第二阶段实现
+`leave` 通过审批应用服务创建/撤回流程；审批通过 `ApprovalBusinessHandler` 端口通知业务，业务不能写审批表。条件更新与版本字段处理并发。状态：请假 `DRAFT -> SUBMITTED -> EFFECTIVE|REJECTED` 或 `SUBMITTED -> CANCELLED`；审批 `PENDING -> APPROVED|REJECTED|WITHDRAWN`。授权层解析用户、部门和角色，服务层复核归属并禁止自审。

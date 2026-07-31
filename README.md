@@ -52,3 +52,8 @@ MySQL 模式：先执行 `docker compose -f deploy/docker-compose.yml up mysql -
 已实现统一响应、异常和校验，JWT 无状态认证、安全入口、BCrypt 登录、当前用户和统计接口、Actuator/业务健康检查、OpenAPI、Flyway、H2/MySQL 双模式、基础 RBAC 数据结构、审计表，以及前端路由守卫、请求拦截、用户 Store、登录、布局、工作台、403/404 和预留业务入口。
 
 尚未实现动态菜单/细粒度服务端授权、令牌刷新撤销、数据范围、审计切面、审批状态机、请假/立项 CRUD 和审批闭环、通知、智能助手、MCP/Skill 实现以及生产监控。这些内容应按 `docs/architecture.md` 的实施顺序完成，下一任务建议优先交付“统一审批内核 + 请假纵向闭环”。
+
+## 第二阶段：统一审批与请假闭环
+已交付请假草稿 CRUD、本人分页筛选、后端时长计算、提交/撤回，以及统一审批实例、待办/已办、详情时间线、同意/拒绝和业务回调。任务由服务端按同部门负责人、管理员兜底规则分配；JWT 角色转为 GrantedAuthority，所有权、任务归属、自审、重复操作及状态转换均在服务端校验。关键操作采用隔离的 best-effort 审计事务。
+
+接口为 `/api/leave-applications`（CRUD、submit、withdraw）及 `/api/approval` 下待办、已办、详情、同意和拒绝。页面包括请假列表/表单/详情、我的申请、待办、已办和审批详情。演示：employee/password 提交，manager/password 处理，employee 查看结果或处理前撤回。V3 新增字段、约束与索引，未修改 V1/V2。立项、动态流程、通知尚未实现。
