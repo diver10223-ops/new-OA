@@ -1,64 +1,9 @@
-# 本次交付清单
+# 第二阶段交付
 
-## 可运行能力
+已实现统一审批实例/任务、服务端选人、并发控制、待办/已办/时间线/同意/拒绝/撤回；请假 CRUD、分页筛选、提交与状态闭环；JWT 角色权限、归属及自审校验；隔离型 best-effort 审计；请假和审批完整页面；V3 字段、约束和索引。
 
-- 后端应用入口、统一响应、全局异常、参数校验、JWT 认证、Spring Security 方法权限基础、BCrypt 登录、当前用户、首页统计、健康检查、OpenAPI 与 Actuator。
-- H2 零依赖开发模式、MySQL 8 Profile、Flyway 基线和安全哈希演示数据。
-- 登录页、系统主框架、顶部栏、侧栏、工作台、路由守卫、Axios 拦截器、Pinia 用户状态、403/404、业务占位入口和统一视觉样式。
-- Docker Compose、前后端镜像配置、架构设计、权限矩阵、状态设计、接口/页面清单、实施计划与开发规范。
+权限：员工仅管理本人申请；负责人/管理员仅处理分配给自己的任务；任何人不得越权查看、处理未分配任务或自审。账号均为 `password`：`employee` 提交，`manager` 处理，`admin` 在无负责人时兜底。审计位于 `sys_operation_log`。
 
-## 明确未交付
+接口：请假 CRUD/list/detail/submit/withdraw；审批 pending/completed/instance detail/approve/reject。页面：请假列表/表单/详情、我的申请、待办、已办、审批详情。
 
-本次没有实现请假和立项的表单保存、提交、审批、查询业务，没有实现统一审批状态机、动态授权管理、通知投递、审计切面或智能助手执行能力。数据表与模块入口用于降低下一阶段返工，不代表完整业务能力。
-
-## 新增及修改文件
-
-```text
-.gitignore
-README.md
-pom.xml
-database/README.md
-deploy/docker-compose.yml
-docs/architecture.md
-docs/development.md
-docs/delivery.md
-oa-server/Dockerfile
-oa-server/pom.xml
-oa-server/src/main/java/com/smartoa/OaApplication.java
-oa-server/src/main/java/com/smartoa/auth/AuthController.java
-oa-server/src/main/java/com/smartoa/common/ApiResponse.java
-oa-server/src/main/java/com/smartoa/common/GlobalExceptionHandler.java
-oa-server/src/main/java/com/smartoa/dashboard/DashboardController.java
-oa-server/src/main/java/com/smartoa/security/JwtFilter.java
-oa-server/src/main/java/com/smartoa/security/JwtService.java
-oa-server/src/main/java/com/smartoa/security/SecurityConfig.java
-oa-server/src/main/resources/application.yml
-oa-server/src/main/resources/application-mysql.yml
-oa-server/src/main/resources/db/migration/V1__baseline.sql
-oa-server/src/main/resources/db/migration/V2__demo_data.sql
-oa-server/src/test/java/com/smartoa/AuthFlowTest.java
-oa-web/Dockerfile
-oa-web/index.html
-oa-web/nginx.conf
-oa-web/package.json
-oa-web/tsconfig.json
-oa-web/tsconfig.app.json
-oa-web/vite.config.ts
-oa-web/src/env.d.ts
-oa-web/src/main.ts
-oa-web/src/App.vue
-oa-web/src/api/http.ts
-oa-web/src/layout/AppLayout.vue
-oa-web/src/router/index.ts
-oa-web/src/stores/user.ts
-oa-web/src/styles.css
-oa-web/src/utils/status.ts
-oa-web/src/utils/status.test.ts
-oa-web/src/views/Dashboard.vue
-oa-web/src/views/Forbidden.vue
-oa-web/src/views/Login.vue
-oa-web/src/views/NotFound.vue
-oa-web/src/views/Placeholder.vue
-```
-
-仓库原有占位文件 `.gitkeep` 已删除。
+尚未实现立项、动态多节点、通知和审计管理页。下一阶段建议复用业务回调端口实现立项多节点和可靠通知。新增 approval、leave、audit、authorization 模块、V3 migration、前端 API/页面；修改安全、异常、路由、状态映射和全部交付文档。

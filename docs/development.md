@@ -15,3 +15,6 @@ Java 类名 PascalCase、变量 camelCase、常量 UPPER_SNAKE_CASE；事务放�
 ## Git 与质量
 
 分支提交保持单一目的，提交信息使用祈使句。合入前至少执行 `mvn test`、前端 `npm run build` 与 `npm test`；业务状态机必须有单元测试，认证和关键闭环必须有集成测试。数据库结构只能通过新增 Flyway migration 变更。
+
+## 第二阶段验证
+执行 `mvn test`、`cd oa-web && npm install && npm test && npm run build`。默认 H2 启动后按 README 演示；MySQL 8 使用 mysql profile。后续数据库结构只能添加 V4 及以后迁移。OpenAPI 请求时间使用带时区 ISO-8601。
