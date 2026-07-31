@@ -57,3 +57,9 @@ MySQL 模式：先执行 `docker compose -f deploy/docker-compose.yml up mysql -
 已交付请假草稿 CRUD、本人分页筛选、后端时长计算、提交/撤回，以及统一审批实例、待办/已办、详情时间线、同意/拒绝和业务回调。任务由服务端按同部门负责人、管理员兜底规则分配；JWT 角色转为 GrantedAuthority，所有权、任务归属、自审、重复操作及状态转换均在服务端校验。关键操作采用隔离的 best-effort 审计事务。
 
 接口为 `/api/leave-applications`（CRUD、submit、withdraw）及 `/api/approval` 下待办、已办、详情、同意和拒绝。页面包括请假列表/表单/详情、我的申请、待办、已办和审批详情。演示：employee/password 提交，manager/password 处理，employee 查看结果或处理前撤回。V3 新增字段、约束与索引，未修改 V1/V2。立项、动态流程、通知尚未实现。
+
+## 第三阶段：立项多节点闭环
+
+本阶段已将统一审批推进为串行多节点流程，并交付立项草稿 CRUD、本人数据范围、提交、撤回与结项。立项提交后由同部门负责人初审，初审通过才创建项目管理人员复核任务；任一节点拒绝立即终止，最终通过后立项状态为 `ESTABLISHED`。审批人、申请人、部门、状态与节点均由服务端推导。V4 新增立项完整字段、数据库序列、审计业务/追踪字段与索引，V1-V3 保持不变。
+
+演示流程：`employee/password` 创建并提交 → `manager/password` 初审 → `project/password` 复核 → employee 在立项列表查看最终状态。当前实现为固定定义的串行单人节点，尚未提供可视化流程设计器、会签、或签、转办与通知。
