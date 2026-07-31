@@ -67,3 +67,9 @@ JWT 仅用于身份传递，最终权限由服务端角色/菜单/数据范围�
 
 ## 第二阶段实现
 `leave` 通过审批应用服务创建/撤回流程；审批通过 `ApprovalBusinessHandler` 端口通知业务，业务不能写审批表。条件更新与版本字段处理并发。状态：请假 `DRAFT -> SUBMITTED -> EFFECTIVE|REJECTED` 或 `SUBMITTED -> CANCELLED`；审批 `PENDING -> APPROVED|REJECTED|WITHDRAWN`。授权层解析用户、部门和角色，服务层复核归属并禁止自审。
+
+## 第三阶段多节点审批设计
+
+统一审批按 `business_type` 选择流程定义，不依赖具体业务表。立项固定版本包含 `DEPARTMENT_MANAGER`、`PROJECT_REVIEW` 两个串行单人节点；节点完成与下一任务创建、实例结论及业务回调均处于同一事务。条件更新和版本号保证审批/撤回竞争只有一方成功。业务模块仅实现 `ApprovalBusinessHandler` 端口，不能写审批表。
+
+立项状态为 `DRAFT -> SUBMITTED -> ESTABLISHED -> CLOSED`，提交态亦可由拒绝进入 `REJECTED`，在尚无节点完成时可撤回为 `CANCELLED`。数据范围默认仅申请人本人；任务只能由受派人处理，并始终禁止自审。项目复核要求真实 `ROLE_PROJECT_MANAGER` authority。

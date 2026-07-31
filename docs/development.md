@@ -18,3 +18,7 @@ Java 类名 PascalCase、变量 camelCase、常量 UPPER_SNAKE_CASE；事务放�
 
 ## 第二阶段验证
 执行 `mvn test`、`cd oa-web && npm install && npm test && npm run build`。默认 H2 启动后按 README 演示；MySQL 8 使用 mysql profile。后续数据库结构只能添加 V4 及以后迁移。OpenAPI 请求时间使用带时区 ISO-8601。
+
+## 立项与迁移验证
+
+V4 是第三阶段唯一数据库增量，加入数据库事务序列和立项字段。默认执行 `mvn test` 会在 H2 MySQL 模式运行 Flyway V1-V4；目标库使用 `docker compose -f deploy/docker-compose.yml up mysql -d` 后执行 `SPRING_PROFILES_ACTIVE=mysql mvn -pl oa-server spring-boot:run`。前端质量命令为 `npm test --prefix oa-web` 和 `npm run build --prefix oa-web`。
