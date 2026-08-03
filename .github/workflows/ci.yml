@@ -1,0 +1,119 @@
+name: Smart OA CI
+
+on:
+  push:
+    branches: [main, work]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-h2:
+    name: Backend tests (H2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Run backend tests and H2 Flyway migrations
+        run: mvn --batch-mode --no-transfer-progress test
+
+      - name: Upload backend test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-h2-test-reports
+          path: oa-server/target/surefire-reports/
+          if-no-files-found: ignore
+
+  frontend:
+    name: Frontend tests and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: npm install
+        working-directory: oa-web
+
+      - name: Run frontend tests
+        run: npm test
+        working-directory: oa-web
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: oa-web
+
+      - name: Upload frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: oa-web-dist
+          path: oa-web/dist/
+          if-no-files-found: error
+
+  backend-mysql:
+    name: Backend tests and Flyway migrations (MySQL 8)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: smart_oa
+          MYSQL_USER: smartoa
+          MYSQL_PASSWORD: smartoa_dev
+          MYSQL_ROOT_PASSWORD: root_dev
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot_dev"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Run tests against MySQL 8
+        env:
+          SPRING_PROFILES_ACTIVE: mysql
+          DB_URL: jdbc:mysql://127.0.0.1:3306/smart_oa?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&allowPublicKeyRetrieval=true
+          DB_USERNAME: smartoa
+          DB_PASSWORD: smartoa_dev
+        run: mvn --batch-mode --no-transfer-progress test
+
+      - name: Upload MySQL test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-mysql-test-reports
+          path: oa-server/target/surefire-reports/
+          if-no-files-found: ignore
