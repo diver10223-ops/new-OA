@@ -1,0 +1,29 @@
+<script setup lang="ts">
+import { onMounted, reactive, ref } from 'vue'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { projectApi, type ProjectForm } from '../api/project'
+import { statusLabel, statusType } from '../utils/status'
+import { useRouter } from 'vue-router'
+
+const loading = ref(false), saving = ref(false), rows = ref<any[]>([]), total = ref(0), dialog = ref(false)
+const formRef = ref<FormInstance>(), editingId = ref<number>(), q = reactive({ status: '', keyword: '', page: 0, size: 10 })
+const form = reactive<ProjectForm>({ projectName: '', projectOwner: '', plannedStartDate: '', plannedEndDate: '', budget: 0, summary: '' })
+const router = useRouter()
+const rules: FormRules = {
+  projectName: [{ required: true, message: '请输入项目名称' }], projectOwner: [{ required: true, message: '请输入项目负责人' }],
+  plannedStartDate: [{ required: true, message: '请选择开始日期' }], plannedEndDate: [{ required: true, message: '请选择结束日期' }],
+  summary: [{ required: true, message: '请输入项目摘要' }], budget: [{ type: 'number', min: 0, message: '预算不能小于零' }],
+}
+async function load() { loading.value = true; try { const r: any = await projectApi.list(q); rows.value = r.data.items; total.value = r.data.total } finally { loading.value = false } }
+function create() { editingId.value = undefined; Object.assign(form, { projectName: '', projectOwner: '', plannedStartDate: '', plannedEndDate: '', budget: 0, summary: '' }); dialog.value = true }
+async function edit(row: any) { const r: any = await projectApi.detail(row.id); editingId.value = row.id; Object.assign(form, r.data); dialog.value = true }
+async function save(submit = false) { await formRef.value?.validate(); if (form.plannedStartDate >= form.plannedEndDate) return ElMessage.error('开始日期必须早于结束日期'); saving.value = true; try { let id = editingId.value; if (id) await projectApi.update(id, form); else { const r: any = await projectApi.create(form); id = r.data.id } if (submit && id) await projectApi.submit(id); dialog.value = false; ElMessage.success(submit ? '已提交审批' : '草稿已保存'); load() } finally { saving.value = false } }
+async function action(row: any, type: 'remove'|'submit'|'withdraw'|'close') { await ElMessageBox.confirm('确认执行此操作？', '操作确认'); await projectApi[type](row.id); ElMessage.success('操作成功'); load() }
+onMounted(load)
+</script>
+<template>
+  <div class="page-title"><h1>立项申请</h1><p>部门初审与项目管理复核的多节点审批闭环</p></div>
+  <el-card class="query"><el-form inline><el-form-item label="状态"><el-select v-model="q.status" clearable style="width:140px"><el-option v-for="s in ['DRAFT','SUBMITTED','ESTABLISHED','REJECTED','CANCELLED','CLOSED']" :key="s" :label="statusLabel(s)" :value="s"/></el-select></el-form-item><el-form-item label="关键字"><el-input v-model="q.keyword" clearable placeholder="项目名称或编码"/></el-form-item><el-form-item><el-button type="primary" @click="q.page=0;load()">查询</el-button><el-button type="success" @click="create">新建立项</el-button></el-form-item></el-form></el-card>
+  <el-card><el-table :data="rows" v-loading="loading" empty-text="暂无立项申请"><el-table-column prop="applicationNo" label="申请单号"/><el-table-column prop="projectName" label="项目名称"/><el-table-column prop="projectOwner" label="项目负责人"/><el-table-column prop="budget" label="预算"/><el-table-column label="状态"><template #default="s"><el-tag :type="statusType(s.row.businessStatus)">{{statusLabel(s.row.businessStatus)}}</el-tag></template></el-table-column><el-table-column label="操作" width="310"><template #default="s"><el-button link @click="router.push('/project/'+s.row.id)">详情</el-button><el-button v-if="s.row.businessStatus==='DRAFT'" link @click="edit(s.row)">编辑</el-button><el-button v-if="s.row.businessStatus==='DRAFT'" link type="primary" @click="action(s.row,'submit')">提交</el-button><el-button v-if="s.row.businessStatus==='DRAFT'" link type="danger" @click="action(s.row,'remove')">删除</el-button><el-button v-if="s.row.businessStatus==='SUBMITTED'" link type="warning" @click="action(s.row,'withdraw')">撤回</el-button><el-button v-if="s.row.businessStatus==='ESTABLISHED'" link @click="action(s.row,'close')">结项</el-button></template></el-table-column></el-table><el-pagination v-model:current-page="q.page" :page-size="q.size" :total="total" @current-change="p=>{q.page=p-1;load()}"/></el-card>
+  <el-dialog v-model="dialog" :title="editingId?'编辑立项草稿':'新建立项申请'" width="620px"><el-form ref="formRef" :model="form" :rules="rules" label-width="100px"><el-form-item label="项目名称" prop="projectName"><el-input v-model="form.projectName" maxlength="200"/></el-form-item><el-form-item label="项目负责人" prop="projectOwner"><el-input v-model="form.projectOwner"/></el-form-item><el-row :gutter="16"><el-col :span="12"><el-form-item label="开始日期" prop="plannedStartDate"><el-date-picker v-model="form.plannedStartDate" value-format="YYYY-MM-DD"/></el-form-item></el-col><el-col :span="12"><el-form-item label="结束日期" prop="plannedEndDate"><el-date-picker v-model="form.plannedEndDate" value-format="YYYY-MM-DD"/></el-form-item></el-col></el-row><el-form-item label="预算金额" prop="budget"><el-input-number v-model="form.budget" :min="0" :precision="2"/></el-form-item><el-form-item label="项目摘要" prop="summary"><el-input v-model="form.summary" type="textarea" :rows="4" maxlength="1000" show-word-limit/></el-form-item></el-form><template #footer><el-button @click="dialog=false">取消</el-button><el-button :loading="saving" @click="save(false)">保存草稿</el-button><el-button type="primary" :loading="saving" @click="save(true)">保存并提交</el-button></template></el-dialog>
+</template>
