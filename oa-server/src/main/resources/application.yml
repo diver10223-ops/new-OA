@@ -6,7 +6,7 @@ spring:
     password:
   flyway:
     locations: classpath:db/migration
-    placeholders.passwordHash: "$2a$10$7EqJtq98hPqEX7fNZaFWoO5u5P6Bdb2ZJXJYl0vQefTnCikH8eRrW"
+    placeholders.passwordHash: "$2a$10$Dow1E3ycUvGIX5FYmRFZhe5LmZ/0kw7E68mB260d9XwbQmzqlT5I6"
   h2.console.enabled: true
 server.port: 8080
 oa.jwt:
