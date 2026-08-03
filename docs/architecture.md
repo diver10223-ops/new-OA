@@ -1,0 +1,75 @@
+# 智能 OA 第一阶段技术与架构设计
+
+## 技术选型
+
+前端采用 Vue 3、TypeScript、Vite、Element Plus、Pinia、Vue Router 与 Axios；后端采用 Java 17、Spring Boot 3、Spring Security、JWT、MyBatis-Plus、Flyway 和 Maven；生产目标数据库为 MySQL 8，OpenAPI 由 springdoc 提供。Java 17 是长期支持版本且满足 Spring Boot 3。Redis 暂不成为启动依赖，待缓存、分布式锁或可靠通知出现真实需求时引入。开发默认使用 H2 的 MySQL 兼容模式，使空环境无需外部服务即可验证；MySQL Profile 和 Docker Compose 保证目标环境不变。
+
+## 总体架构
+
+采用前后端分离的模块化单体：浏览器通过 REST API 访问服务端；服务端内部按 `system / organization / authorization / approval / leave / project / notification / audit / assistant / integration` 限界上下文演进，共享统一安全、异常、响应和持久化基础设施。业务模块只能通过明确的应用服务协作，禁止绕过统一审批直接改审批结论。
+
+统一审批以 `approval_instance` 和 `approval_task` 保存流程状态，通过 `business_type + business_id` 关联业务单据。请假、立项表只保存自身业务状态和审批实例引用，从而解耦业务状态与审批状态。关键命令后续均采用事务、状态机前置校验、乐观锁 `version`、权限复核和审计记录。
+
+智能助手位于独立适配边界，只可调用受鉴权的应用服务，不直接访问业务表。预留 `Agent Gateway -> Skill Registry -> MCP Adapter -> Application Service` 链路；外部模型、MCP 工具与核心域通过 DTO/端口隔离，可独立关闭和替换。
+
+## 安全与可观测性
+
+JWT 仅用于身份传递，最终权限由服务端角色/菜单/数据范围判定；前端路由守卫只改善体验。密码使用 BCrypt。写接口必须校验身份、功能权限、数据范围和当前状态；关键写入落操作审计。统一错误码分段：`40xxx` 客户端/校验，`401xx` 认证，`403xx` 授权，`50xxx` 服务端。生产须替换 JWT 密钥、启用 HTTPS、限制 Swagger、配置日志脱敏与令牌撤销策略。
+
+## 模块职责
+
+| 模块 | 职责 |
+|---|---|
+| 系统管理 | 菜单、字典、配置 |
+| 组织与用户 | 部门、人员、上下级关系 |
+| 角色与权限 | RBAC、数据范围、服务端鉴权 |
+| 统一审批 | 流程实例、任务、动作、状态机 |
+| 请假管理 | 请假单与业务规则 |
+| 立项管理 | 项目申请与业务规则 |
+| 消息通知 | 站内信及后续多渠道投递 |
+| 操作审计 | 请求与关键领域操作留痕 |
+| 智能助手 | 意图编排、Skill 调用、人工确认 |
+| 外部适配 | Agent Gateway、MCP、第三方系统防腐层 |
+
+## 数据模型与状态
+
+基础实体为部门、用户、角色、用户角色、菜单、角色菜单、字典、操作日志。审批实体与业务实体使用逻辑关联，避免审批引擎依赖某一业务。
+
+请假业务状态：`DRAFT -> SUBMITTED -> EFFECTIVE`；任一步骤可按规则进入 `CANCELLED`，审批拒绝进入 `REJECTED`。审批状态独立为 `PENDING / APPROVED / REJECTED / WITHDRAWN`。建议流程为员工提交、部门负责人审批；申请人是负责人时按组织规则上提。
+
+立项业务状态：`DRAFT -> SUBMITTED -> ESTABLISHED -> CLOSED`，拒绝为 `REJECTED`，撤回为 `CANCELLED`。审批状态仍使用统一枚举。建议流程为部门负责人审核、项目管理人员复核；预算超过阈值可配置追加节点，而非硬编码。
+
+## 角色权限矩阵
+
+| 能力 | 普通员工 | 部门负责人 | 项目管理 | 管理员 |
+|---|:---:|:---:|:---:|:---:|
+| 查看工作台/本人申请 | ✓ | ✓ | ✓ | ✓ |
+| 新建请假/立项 | ✓ | ✓ | ✓ | ✓ |
+| 审批本部门请假 | - | ✓ | - | 可配置 |
+| 立项复核 | - | - | ✓ | 可配置 |
+| 用户、角色、菜单维护 | - | - | - | ✓ |
+| 查看全局审计 | - | - | - | ✓ |
+
+## 后续接口与页面
+
+接口：部门/用户/角色/菜单 CRUD，权限树；`POST/GET /leave-applications`，提交/撤回/取消；`POST/GET /project-applications`，提交/撤回/结项；审批待办、已办、详情以及 approve/reject/transfer；我的申请；通知读取；审计查询；字典查询；Agent 会话、Skill 清单、MCP 工具调用确认。
+
+页面：组织用户、角色授权、菜单字典、请假列表/表单/详情、立项列表/表单/详情、待办/已办/审批详情、我的申请、消息中心、审计日志、助手会话与外部适配配置。
+
+## 实施顺序
+
+1. **骨架（本次）**：安全、数据基线、登录、工作台、导航、部署和规范。
+2. **统一审批内核**：状态机、任务查询、审批命令、审计及并发测试。
+3. **请假闭环**：表单、提交、审批、撤回、查询和权限测试，验证第一个纵向切片。
+4. **立项闭环**：复用审批能力，增加多节点、项目管理复核和查询。
+5. **平台完善**：组织权限管理、通知、可观测性、Redis（按需）、端到端测试。
+6. **智能能力**：只读助手开始，逐步引入需人工确认的写 Skill 与 MCP 适配。
+
+## 第二阶段实现
+`leave` 通过审批应用服务创建/撤回流程；审批通过 `ApprovalBusinessHandler` 端口通知业务，业务不能写审批表。条件更新与版本字段处理并发。状态：请假 `DRAFT -> SUBMITTED -> EFFECTIVE|REJECTED` 或 `SUBMITTED -> CANCELLED`；审批 `PENDING -> APPROVED|REJECTED|WITHDRAWN`。授权层解析用户、部门和角色，服务层复核归属并禁止自审。
+
+## 第三阶段多节点审批设计
+
+统一审批按 `business_type` 选择流程定义，不依赖具体业务表。立项固定版本包含 `DEPARTMENT_MANAGER`、`PROJECT_REVIEW` 两个串行单人节点；节点完成与下一任务创建、实例结论及业务回调均处于同一事务。条件更新和版本号保证审批/撤回竞争只有一方成功。业务模块仅实现 `ApprovalBusinessHandler` 端口，不能写审批表。
+
+立项状态为 `DRAFT -> SUBMITTED -> ESTABLISHED -> CLOSED`，提交态亦可由拒绝进入 `REJECTED`，在尚无节点完成时可撤回为 `CANCELLED`。数据范围默认仅申请人本人；任务只能由受派人处理，并始终禁止自审。项目复核要求真实 `ROLE_PROJECT_MANAGER` authority。

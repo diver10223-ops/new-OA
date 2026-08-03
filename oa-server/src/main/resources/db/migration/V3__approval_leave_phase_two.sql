@@ -1,0 +1,14 @@
+ALTER TABLE approval_instance ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE approval_instance ADD COLUMN completed_at TIMESTAMP NULL;
+ALTER TABLE approval_task ADD COLUMN node_name VARCHAR(100) NOT NULL DEFAULT '部门负责人审批';
+ALTER TABLE approval_task ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE leave_application ADD COLUMN application_no VARCHAR(40);
+ALTER TABLE leave_application ADD COLUMN department_id BIGINT;
+ALTER TABLE leave_application ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE leave_application ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+CREATE UNIQUE INDEX uk_approval_business ON approval_instance(business_type,business_id);
+CREATE INDEX idx_leave_applicant_created ON leave_application(applicant_id,created_at);
+CREATE INDEX idx_leave_status ON leave_application(business_status);
+CREATE INDEX idx_approval_status ON approval_instance(status);
+CREATE INDEX idx_task_assignee_status ON approval_task(assignee_id,status);
+CREATE INDEX idx_audit_operator_created ON sys_operation_log(operator_id,created_at);

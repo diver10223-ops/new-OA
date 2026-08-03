@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/smart_oa?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:smartoa}
+    password: ${DB_PASSWORD:smartoa_dev}
+  flyway.placeholders.passwordHash: ${DEMO_PASSWORD_HASH:$2a$10$7EqJtq98hPqEX7fNZaFWoO5u5P6Bdb2ZJXJYl0vQefTnCikH8eRrW}
