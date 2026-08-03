@@ -101,7 +101,11 @@ public class ProjectService {
         validatePage(page, size); var user = users.current();
         StringBuilder where = new StringBuilder(" where p.applicant_id=?");
         List<Object> args = new ArrayList<>(List.of(user.id()));
-        if (status != null && !status.isBlank()) { ProjectStatus.valueOf(status); where.append(" and p.business_status=?"); args.add(status); }
+        if (status != null && !status.isBlank()) {
+            try { ProjectStatus.valueOf(status); }
+            catch (IllegalArgumentException ex) { throw new BusinessException(40031, "无效的立项状态"); }
+            where.append(" and p.business_status=?"); args.add(status);
+        }
         if (keyword != null && !keyword.isBlank()) { where.append(" and (p.project_name like ? or p.project_code like ?)"); args.add("%" + keyword + "%"); args.add("%" + keyword + "%"); }
         long total = jdbc.queryForObject("select count(*) from project_application p" + where, Long.class, args.toArray());
         args.add(size); args.add(page * size);

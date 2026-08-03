@@ -10,7 +10,7 @@ public class LeaveController {
  @Operation(summary="创建请假草稿")@PostMapping ApiResponse<Map<String,Long>> create(@Valid@RequestBody Request r){return ApiResponse.ok(Map.of("id",service.create(r.command())));}
  @PutMapping("/{id}")ApiResponse<Void> update(@PathVariable long id,@Valid@RequestBody Request r){service.update(id,r.command());return ApiResponse.ok(null);}
  @DeleteMapping("/{id}")ApiResponse<Void> delete(@PathVariable long id){service.delete(id);return ApiResponse.ok(null);}
- @GetMapping ApiResponse<PageResult<Map<String,Object>>> list(@RequestParam(defaultValue="0")int page,@RequestParam(defaultValue="10")int size,@RequestParam(required=false)String status,@RequestParam(required=false)String leaveType,@RequestParam(required=false)String startDate,@RequestParam(required=false)String endDate){return ApiResponse.ok(service.list(page,Math.min(size,100),status,leaveType,startDate,endDate));}
+ @GetMapping ApiResponse<PageResult<Map<String,Object>>> list(@RequestParam(defaultValue="0")int page,@RequestParam(defaultValue="10")int size,@RequestParam(required=false)String status,@RequestParam(required=false)String leaveType,@RequestParam(required=false)String startDate,@RequestParam(required=false)String endDate){return ApiResponse.ok(service.list(page,size,status,leaveType,startDate,endDate));}
  @GetMapping("/{id}")ApiResponse<Map<String,Object>> detail(@PathVariable long id){return ApiResponse.ok(service.detail(id));}
  @PostMapping("/{id}/submit")ApiResponse<Void> submit(@PathVariable long id){service.submit(id);return ApiResponse.ok(null);}
  @PostMapping("/{id}/withdraw")ApiResponse<Void> withdraw(@PathVariable long id){service.withdraw(id);return ApiResponse.ok(null);}

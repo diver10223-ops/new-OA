@@ -1,0 +1,2 @@
+<script setup lang="ts">import{useRouter}from'vue-router';const router=useRouter()</script>
+<template><div class="page-title"><h1>我的申请</h1><p>统一进入并跟踪个人发起的业务申请</p></div><el-row :gutter="18"><el-col :sm="12"><el-card><h3>请假申请</h3><p>新建、编辑、提交、撤回并查看审批结果。</p><el-button type="primary" @click="router.push('/leave')">进入请假管理</el-button></el-card></el-col><el-col :sm="12"><el-card><h3>立项申请</h3><p>发起立项并跟踪部门初审和项目管理复核。</p><el-button type="primary" @click="router.push('/project')">进入立项管理</el-button></el-card></el-col></el-row></template>
