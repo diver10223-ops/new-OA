@@ -1,0 +1,7 @@
+policies:
+  - id: org_view_policy
+    name: 机构视图策略
+    description: 演示级简单策略，根据示例用户的 org 列表判断是否可以查看指标
+    rules:
+      - type: allow_if_org_in_list
+        param: allowed_orgs # 从 mock user 读取

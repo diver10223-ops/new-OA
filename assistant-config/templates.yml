@@ -1,0 +1,19 @@
+templates:
+  - id: indicator_card
+    title: 指标卡
+    view: |
+      title: "{{indicatorName}}"
+      value: "{{value}}"
+      meta:
+        - "口径: {{calculation}}"
+        - "机构: {{org}}"
+        - "时间: {{time}}"
+      footer_buttons:
+        - label: "查看轨迹"
+          action: "showTrace"
+
+  - id: candidate_list
+    title: 候选指标
+    view: |
+      items: "{{candidates}}"
+      note: "请选择一个候选项继续"

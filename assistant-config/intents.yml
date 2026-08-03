@@ -1,0 +1,22 @@
+intents:
+  - id: query_deposit_balance
+    name: 查询存款余额
+    examples:
+      - "本月本分行存款余额"
+      - "本分行存款余额是多少"
+      - "今天我们分行的存款余额"
+    synonyms: ["存款余额", "存款总额", "存款盘子"]
+
+  - id: query_avg_deposit
+    name: 查询日均存款
+    examples:
+      - "本月日均存款余额"
+      - "日均存款"
+    synonyms: ["日均存款", "平均存款"]
+
+  - id: query_loan_deposit_ratio
+    name: 查询存贷比
+    examples:
+      - "本月存贷比"
+      - "存贷比是多少"
+    synonyms: ["存贷比", "贷款存款比"]

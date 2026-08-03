@@ -1,0 +1,88 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+import { approvalApi } from '../api/leave';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { useRouter } from 'vue-router';
+
+const p = defineProps<{ completed?: boolean }>();
+const rows = ref<any[]>([]);
+const loading = ref(false);
+const acting = ref<number | null>(null);
+const router = useRouter();
+
+async function load() {
+  loading.value = true;
+  try {
+    rows.value = ((await approvalApi.tasks(!!p.completed)) as any).data.items;
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function decide(row: any, approve: boolean) {
+  const { value } = await ElMessageBox.prompt(
+    approve ? '请输入审批意见（可选）' : '请输入拒绝原因',
+    '审批处理',
+    {
+      inputValidator: (v: string) => approve || !!v || '拒绝时必须填写意见',
+    }
+  );
+  acting.value = row.id;
+  try {
+    await approvalApi.decide(row.id, approve, value || '');
+    ElMessage.success('审批已处理');
+    await load();
+  } finally {
+    acting.value = null;
+  }
+}
+
+onMounted(load);
+</script>
+
+<template>
+  <div class="page-title">
+    <h1>{{ completed ? '我的已办' : '我的待办' }}</h1>
+    <p>{{ completed ? '查看历史审批处理记录' : '处理分配给我的审批任务' }}</p>
+  </div>
+
+  <el-card>
+    <el-table :data="rows" v-loading="loading" empty-text="暂无记录">
+      <el-table-column prop="businessType" label="申请类型" />
+      <el-table-column prop="applicantName" label="申请人" />
+      <el-table-column prop="nodeName" label="当前节点" />
+      <el-table-column
+        :prop="completed ? 'handledAt' : 'createdAt'"
+        :label="completed ? '处理时间' : '提交时间'"
+      />
+      <el-table-column v-if="completed" prop="status" label="结果" />
+      <el-table-column label="操作">
+        <template #default="scope">
+          <el-button link @click="router.push('/approval/' + scope.row.instanceId)">
+            查看详情
+          </el-button>
+          <template v-if="!completed">
+            <el-button
+              type="success"
+              link
+              :loading="acting === scope.row.id"
+              :disabled="acting !== null"
+              @click="decide(scope.row, true)"
+            >
+              同意
+            </el-button>
+            <el-button
+              type="danger"
+              link
+              :loading="acting === scope.row.id"
+              :disabled="acting !== null"
+              @click="decide(scope.row, false)"
+            >
+              拒绝
+            </el-button>
+          </template>
+        </template>
+      </el-table-column>
+    </el-table>
+  </el-card>
+</template>

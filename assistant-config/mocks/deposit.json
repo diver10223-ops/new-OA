@@ -1,0 +1,23 @@
+{
+  "users": [
+    {"id":"demo_leader","name":"行长","roles":["leader"], "org":"HEADQUARTERS"},
+    {"id":"demo_branch_manager","name":"分行经理","roles":["manager"], "org":"BRANCH_001"}
+  ],
+  "indicators": {
+    "deposit_balance": {
+      "A": {"HEADQUARTERS": 1200000000, "BRANCH_001": 15000000},
+      "B": {"HEADQUARTERS": 1180000000, "BRANCH_001": 14500000}
+    },
+    "avg_deposit": {
+      "A": {"HEADQUARTERS": 40000000, "BRANCH_001": 500000},
+      "B": {"HEADQUARTERS": 39500000, "BRANCH_001": 480000}
+    },
+    "loan_deposit_ratio": {
+      "A": {"HEADQUARTERS": 0.55, "BRANCH_001": 0.62},
+      "B": {"HEADQUARTERS": 0.53, "BRANCH_001": 0.60}
+    }
+  },
+  "candidates": {
+    "deposit_case": ["deposit_balance","avg_deposit","deposit_new"]
+  }
+}

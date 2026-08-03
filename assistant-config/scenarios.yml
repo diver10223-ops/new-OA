@@ -1,0 +1,32 @@
+scenarios:
+  - id: deposit_balance_standard
+    name: 存款余额-标准卡片
+    intent: query_deposit_balance
+    slots: ["time","org"]
+    domainType: "analytics"
+    mode: "A" # A 为标准卡片直达
+    skills:
+      - read_indicator
+    template: indicator_card
+    policies: ["org_view_policy"]
+
+  - id: deposit_balance_candidates
+    name: 存款情况-候选
+    intent: query_deposit_balance
+    slots: ["time","org"]
+    mode: "candidate"
+    skills:
+      - list_candidates
+    template: candidate_list
+    policies: ["org_view_policy"]
+
+  - id: loan_deposit_ratio_ab
+    name: 存贷比-A/B示例
+    intent: query_loan_deposit_ratio
+    slots: ["time","org"]
+    mode: "AB"
+    skills:
+      - read_indicator
+      - derived_calc
+    template: indicator_card
+    policies: ["org_view_policy"]

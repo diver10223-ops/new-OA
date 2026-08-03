@@ -1,0 +1,26 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: smart_oa
+      MYSQL_USER: smartoa
+      MYSQL_PASSWORD: smartoa_dev
+      MYSQL_ROOT_PASSWORD: root_dev
+    ports: ["3306:3306"]
+    volumes: ["mysql-data:/var/lib/mysql"]
+    healthcheck: {test: ["CMD", "mysqladmin", "ping", "-h", "localhost"], interval: 5s, timeout: 3s, retries: 20}
+  server:
+    build: ../oa-server
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      DB_URL: jdbc:mysql://mysql:3306/smart_oa?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      DB_USERNAME: smartoa
+      DB_PASSWORD: smartoa_dev
+      OA_JWT_SECRET: change-this-production-secret-at-least-32-bytes
+    ports: ["8080:8080"]
+    depends_on: {mysql: {condition: service_healthy}}
+  web:
+    build: ../oa-web
+    ports: ["80:80"]
+    depends_on: [server]
+volumes: {mysql-data: {}}

@@ -1,0 +1,16 @@
+spring:
+  application.name: smart-oa
+  datasource:
+    url: jdbc:h2:mem:smartoa;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+  flyway:
+    locations: classpath:db/migration
+    placeholders.passwordHash: "$2a$10$Dow1E3ycUvGIX5FYmRFZhe5LmZ/0kw7E68mB260d9XwbQmzqlT5I6"
+  h2.console.enabled: true
+server.port: 8080
+oa.jwt:
+  secret: ${OA_JWT_SECRET:smart-oa-development-secret-must-be-at-least-32-bytes}
+  expiration-seconds: 7200
+springdoc.swagger-ui.path: /swagger-ui.html
+management.endpoints.web.exposure.include: health,info

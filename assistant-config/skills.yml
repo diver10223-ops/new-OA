@@ -1,0 +1,21 @@
+skills:
+  - id: read_indicator
+    name: 读取指标
+    type: read
+    description: 从 Mock Dataset 返回指标值
+
+  - id: list_candidates
+    name: 列出候选指标
+    type: read
+    description: 针对歧义问题返回候选项
+
+  - id: derived_calc
+    name: 衍生计算
+    type: read
+    description: 在后端使用受控公式计算衍生指标（例：存贷比）
+
+  - id: confirm_write
+    name: 写操作确认（占位）
+    type: write
+    requiresConfirmation: true
+    description: 写类 Skill 必须产生确认卡并通过 token 执行

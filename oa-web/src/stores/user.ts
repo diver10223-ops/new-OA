@@ -1,0 +1,3 @@
+import {defineStore} from 'pinia'; import {ref} from 'vue'; import {http} from '../api/http';
+export interface User {username:string;displayName:string;department:string;roles:string[];permissions:string[]}
+export const useUserStore=defineStore('user',()=>{const user=ref<User|null>(null);async function login(username:string,password:string){const r:any=await http.post('/auth/login',{username,password});localStorage.setItem('oa_token',r.data.token)}async function load(){const r:any=await http.get('/users/me');user.value=r.data}function logout(){localStorage.removeItem('oa_token');user.value=null}return{user,login,load,logout}});
