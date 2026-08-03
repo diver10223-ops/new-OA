@@ -1,0 +1,40 @@
+{
+  "name": "Smart OA Development",
+  "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  "forwardPorts": [5173, 8080, 3306],
+  "portsAttributes": {
+    "5173": {
+      "label": "Smart OA Web",
+      "onAutoForward": "openPreview"
+    },
+    "8080": {
+      "label": "Smart OA API",
+      "onAutoForward": "notify"
+    },
+    "3306": {
+      "label": "MySQL 8",
+      "onAutoForward": "silent"
+    }
+  },
+  "postCreateCommand": "mvn --batch-mode -pl oa-server dependency:go-offline && npm install --prefix oa-web",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "Vue.volar",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
