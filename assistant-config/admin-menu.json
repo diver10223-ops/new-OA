@@ -1,0 +1,6 @@
+{
+  "items": [
+    {"id": "metric-definition", "label": "指标定义", "group": "指标管理"},
+    {"id": "metric-preview", "label": "指标数据预览", "group": "指标管理"}
+  ]
+}
