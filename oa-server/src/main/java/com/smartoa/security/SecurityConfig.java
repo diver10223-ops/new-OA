@@ -30,6 +30,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/ask-leader.html").permitAll()
+                        .requestMatchers("/ask-admin.html").permitAll()
+                        .requestMatchers("/api/admin/assistant-config/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/assistant/execute").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/assistant/trace/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

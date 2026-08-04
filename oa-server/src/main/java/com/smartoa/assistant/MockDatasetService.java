@@ -46,6 +46,11 @@ public class MockDatasetService {
         snapshot.putAll(datasets);
     }
 
+    /** Reloads the fixed mock directory after an administrative atomic update. */
+    public synchronized void reload() throws Exception {
+        init();
+    }
+
     public Object getMock(String key) {
         return datasets.get(key);
     }
