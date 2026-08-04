@@ -82,6 +82,40 @@ describe('AskAnalytics', () => {
     expect(wrapper.text()).toContain('查看执行轨迹')
   })
 
+  it.each([
+    {
+      result: { type: 'compare_indicator' as const, indicator: '平均存款', org: '总部', current: 80, previous: 79, difference: 1, changeRate: 0.012658 },
+      expected: ['平均存款 · 对比', '1.27%'],
+    },
+    {
+      result: { type: 'read_trend' as const, indicator: '贷款占比', org: '本分行', trend: [{ period: '四月', value: 0.5 }, { period: '六月', value: 0.55 }] },
+      expected: ['四月', '六月', '55.00%'],
+    },
+  ])('renders comparison and trend result variants', async ({ result, expected }) => {
+    executeApi.mockResolvedValue(assistantResponse('success', { result }))
+    const wrapper = render()
+    await submit(wrapper)
+    await vi.waitFor(() => expect(wrapper.text()).toContain(expected[0]))
+    expected.forEach((text) => expect(wrapper.text()).toContain(text))
+  })
+
+  it('clears the previous result and trace state when a new request starts', async () => {
+    executeApi.mockResolvedValueOnce(assistantResponse('success', {
+      result: { indicator: '旧指标', org: '本分行', value: 123 },
+    }))
+    traceApi.mockRejectedValueOnce(new Error('trace unavailable'))
+    const wrapper = render()
+    await submit(wrapper, '旧问题')
+    await vi.waitFor(() => expect(wrapper.text()).toContain('123'))
+    await wrapper.get('.trace-button').trigger('click')
+    await vi.waitFor(() => expect(wrapper.text()).toContain('执行轨迹加载失败'))
+
+    executeApi.mockReturnValueOnce(pendingResponse)
+    await submit(wrapper, '新问题')
+    expect(wrapper.text()).not.toContain('123')
+    expect(wrapper.text()).not.toContain('执行轨迹加载失败')
+  })
+
   it('renders candidate and unsupported statuses independently', async () => {
     executeApi.mockResolvedValueOnce(assistantResponse('candidate', {
       candidates: [{ code: 'D01', name: '存款余额', unit: '万元' }],

@@ -28,7 +28,7 @@ function isQuery(value: unknown): value is IndicatorQueryResult {
 function isComparison(value: unknown): value is IndicatorComparisonResult {
   return isRecord(value) && (value.type === undefined || value.type === 'compare_indicator')
     && hasText(value.indicator) && hasText(value.org) && hasNumber(value.current) && hasNumber(value.previous)
-    && hasNumber(value.difference) && hasNumber(value.changeRate)
+    && hasNumber(value.difference) && (value.changeRate === null || hasNumber(value.changeRate))
 }
 
 function isTrend(value: unknown): value is IndicatorTrendResult {
@@ -49,8 +49,8 @@ function displayValue(indicator: string, value: number, unit?: string): string {
   return `${value}${unit ? ` ${unit}` : ''}`
 }
 
-function displayChangeRate(value: number): string {
-  return `${(value * 100).toFixed(2)}%`
+function displayChangeRate(value: number | null): string {
+  return value === null ? '暂无' : `${(value * 100).toFixed(2)}%`
 }
 </script>
 

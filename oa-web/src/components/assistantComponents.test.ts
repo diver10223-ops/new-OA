@@ -46,6 +46,16 @@ describe('IndicatorCard', () => {
     expect(wrapper.text()).not.toContain('2000')
   })
 
+  it('renders a nullable comparison change rate without hiding the result', () => {
+    const wrapper = mountIndicator({
+      indicator: '平均存款', org: '总部', current: 12, previous: 0,
+      difference: 12, changeRate: null, changeRateNote: '上期为零，变化率未定义',
+    })
+    expect(wrapper.text()).toContain('本期12')
+    expect(wrapper.text()).toContain('变化率暂无')
+    expect(wrapper.text()).toContain('上期为零，变化率未定义')
+  })
+
   it('preserves trend order and converts loan ratio only for display', () => {
     const data = {
       type: 'read_trend' as const,
