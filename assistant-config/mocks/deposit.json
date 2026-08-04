@@ -1,23 +1,44 @@
 {
   "users": [
-    {"id":"demo_leader","name":"行长","roles":["leader"], "org":"HEADQUARTERS"},
-    {"id":"demo_branch_manager","name":"分行经理","roles":["manager"], "org":"BRANCH_001"}
+    {"id": "demo_leader", "name": "行长", "roles": ["leader"], "org": "HEADQUARTERS"},
+    {"id": "demo_branch_manager", "name": "分行经理", "roles": ["manager"], "org": "BRANCH_001"}
   ],
-  "indicators": {
-    "deposit_balance": {
-      "A": {"HEADQUARTERS": 1200000000, "BRANCH_001": 15000000},
-      "B": {"HEADQUARTERS": 1180000000, "BRANCH_001": 14500000}
+  "indicators": [
+    {
+      "code": "deposit_balance",
+      "name": "存款余额",
+      "unit": "元",
+      "calculation": "统计时点各项存款本金余额合计",
+      "updatedAt": "2026-07-31T18:00:00Z",
+      "orgData": {
+        "HEADQUARTERS": {"current": 1200000000, "previous": 1180000000, "trend": [{"period": "2026-05", "value": 1150000000}, {"period": "2026-06", "value": 1180000000}, {"period": "2026-07", "value": 1200000000}]},
+        "BRANCH_001": {"current": 15000000, "previous": 14500000, "trend": [{"period": "2026-05", "value": 14000000}, {"period": "2026-06", "value": 14500000}, {"period": "2026-07", "value": 15000000}]}
+      }
     },
-    "avg_deposit": {
-      "A": {"HEADQUARTERS": 40000000, "BRANCH_001": 500000},
-      "B": {"HEADQUARTERS": 39500000, "BRANCH_001": 480000}
+    {
+      "code": "avg_deposit",
+      "name": "平均存款",
+      "unit": "元",
+      "calculation": "统计期内每日存款余额之和除以统计天数",
+      "updatedAt": "2026-07-31T18:00:00Z",
+      "orgData": {
+        "HEADQUARTERS": {"current": 40000000, "previous": 39500000, "trend": [{"period": "2026-05", "value": 38800000}, {"period": "2026-06", "value": 39500000}, {"period": "2026-07", "value": 40000000}]},
+        "BRANCH_001": {"current": 500000, "previous": 480000, "trend": [{"period": "2026-05", "value": 460000}, {"period": "2026-06", "value": 480000}, {"period": "2026-07", "value": 500000}]}
+      }
     },
-    "loan_deposit_ratio": {
-      "A": {"HEADQUARTERS": 0.55, "BRANCH_001": 0.62},
-      "B": {"HEADQUARTERS": 0.53, "BRANCH_001": 0.60}
+    {
+      "code": "loan_deposit_ratio",
+      "name": "贷款占比",
+      "unit": "%",
+      "calculation": "贷款余额除以存款余额；数值以小数存储，展示时转换为百分比",
+      "updatedAt": "2026-07-31T18:00:00Z",
+      "orgData": {
+        "HEADQUARTERS": {"current": 0.55, "previous": 0.53, "trend": [{"period": "2026-05", "value": 0.51}, {"period": "2026-06", "value": 0.53}, {"period": "2026-07", "value": 0.55}]},
+        "BRANCH_001": {"current": 0.62, "previous": 0.60, "trend": [{"period": "2026-05", "value": 0.58}, {"period": "2026-06", "value": 0.60}, {"period": "2026-07", "value": 0.62}]}
+      }
     }
-  },
+  ],
   "candidates": {
-    "deposit_case": ["deposit_balance","avg_deposit","deposit_new"]
+    "deposit_case": ["deposit_balance", "avg_deposit", "loan_deposit_ratio"]
   }
 }

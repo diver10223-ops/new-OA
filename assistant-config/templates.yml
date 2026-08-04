@@ -17,3 +17,26 @@ templates:
     view: |
       items: "{{candidates}}"
       note: "请选择一个候选项继续"
+
+  - id: comparison_result
+    title: 指标比较结果
+    view: |
+      indicator: "{{indicatorName}}"
+      current: "{{current}} {{unit}}"
+      previous: "{{previous}} {{unit}}"
+      change: "{{change}} {{unit}}"
+      note: "口径: {{calculation}}"
+
+  - id: trend_result
+    title: 指标趋势结果
+    view: |
+      indicator: "{{indicatorName}}"
+      series: "{{trend}}"
+      unit: "{{unit}}"
+      updatedAt: "{{updatedAt}}"
+
+  - id: default_prompt
+    title: 默认提示
+    view: |
+      message: "我可以查询、比较指标或查看趋势，请说明指标、机构和时间范围。"
+      examples: "存款余额是多少；平均存款比上期如何；贷款占比近三个月趋势"
