@@ -1,79 +1,68 @@
 package com.smartoa.assistant;
 
+import com.smartoa.common.BusinessException;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/assistant")
 public class AssistantController {
-
     private final RegistryLoader loader;
     private final ExecutionPlanner planner;
-    private final ExecutionTraceService traceService;
-    private final MockDatasetService mockService;
+    private final ExecutionTraceService traces;
+    private final MockDatasetService mocks;
 
-    public AssistantController(RegistryLoader loader, ExecutionPlanner planner, ExecutionTraceService traceService, MockDatasetService mockService) {
-        this.loader = loader;
-        this.planner = planner;
-        this.traceService = traceService;
-        this.mockService = mockService;
+    public AssistantController(RegistryLoader loader, ExecutionPlanner planner, ExecutionTraceService traces,
+                               MockDatasetService mocks) {
+        this.loader = loader; this.planner = planner; this.traces = traces; this.mocks = mocks;
     }
 
     @PostMapping("/execute")
-    public ResponseEntity<?> execute(@RequestBody Map<String,Object> req, @RequestHeader(value="X-User-Id", required=false) String userId) {
-        String text = (String) req.getOrDefault("text","");
-        String mode = (String) req.getOrDefault("mode","A");
-        Map<String,Object> plan = planner.plan(text, userId==null?"demo_branch_manager":userId, mode);
-        ExecutionTraceService.Trace trace = traceService.create(text, plan);
-        // simulate permission guard: if user org != target org and not HEADQUARTERS then deny value
-        String org = (String)plan.get("org");
-        boolean allowed = true;
-        if ("BRANCH_001".equals(org) && "demo_branch_manager".equals(userId)==false && userId!=null && !userId.contains("demo")) {
-            allowed = false;
+    public ResponseEntity<AssistantResponse> execute(@Valid @RequestBody AssistantRequest request,
+            @RequestHeader(value = "X-User-Id", required = false) String headerUserId) {
+        String userId = headerUserId == null || headerUserId.isBlank() ? "demo_branch_manager" : headerUserId;
+        ExecutionPlan plan = planner.plan(request, userId);
+        ExecutionTraceService.Trace trace = traces.create(plan);
+        AssistantResponse response;
+        try {
+            ExecutionPlanner.ExecutionResult execution = planner.execute(plan);
+            String status = "planned".equals(plan.status()) ? "success" : plan.status();
+            response = response(trace.id, plan, status, execution.result(), execution.candidates(), Map.of());
+        } catch (BusinessException exception) {
+            String status = exception.status().value() == 403 ? "denied" : "error";
+            response = response(trace.id, plan, status, Map.of(), List.of(),
+                    Map.of("code", exception.code(), "message", exception.getMessage()));
+        } catch (RuntimeException exception) {
+            response = response(trace.id, plan, "error", Map.of(), List.of(),
+                    Map.of("code", 50000, "message", exception.getMessage()));
         }
-        Map<String,Object> result = planner.executePlan(plan);
-        if (!allowed) {
-            result.put("value", null);
-            result.put("denied", true);
-            result.put("reason", "no_permission");
-        } else {
-            result.put("denied", false);
-        }
-        traceService.saveResult(trace.id, result);
-        Map<String,Object> resp = Map.of("traceId", trace.id, "result", result);
-        return ResponseEntity.ok(resp);
+        traces.complete(trace.id, response, plan.skills());
+        return ResponseEntity.ok(response);
+    }
+
+    private AssistantResponse response(String id, ExecutionPlan plan, String status, Map<String, Object> result,
+                                       List<Map<String, Object>> candidates, Map<String, Object> error) {
+        List<String> suggestions = "unsupported".equals(status)
+                ? List.of("存款余额是多少", "平均存款比上期增加多少", "贷款占比近三个月趋势") : List.of();
+        return new AssistantResponse(id, plan.intent(), plan.scenario(), status, plan.slots(),
+                plan.matchedRules(), plan.template(), result, candidates, suggestions, error);
     }
 
     @PostMapping("/continue")
-    public ResponseEntity<?> cont(@RequestBody Map<String,Object> req) {
-        String traceId = (String) req.get("traceId");
-        String token = (String) req.get("token");
-        if (!traceService.validateToken(traceId, token)) {
-            return ResponseEntity.status(400).body(Map.of("error","invalid_token"));
-        }
-        // in demo, write ops update in-memory mock (not implemented here, placeholder)
+    public ResponseEntity<?> cont(@RequestBody Map<String, Object> req) {
+        if (!traces.validateToken((String) req.get("traceId"), (String) req.get("token")))
+            return ResponseEntity.badRequest().body(Map.of("error", "invalid_token"));
         return ResponseEntity.ok(Map.of("ok", true));
     }
-
-    @GetMapping("/config/{name}")
-    public ResponseEntity<?> config(@PathVariable String name) {
-        Object c = loader.getRegistry(name);
-        if (c==null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(c);
+    @GetMapping("/config/{name}") public ResponseEntity<?> config(@PathVariable String name) {
+        Object value = loader.getRegistry(name); return value == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(value);
     }
-
-    @PostMapping("/mock/reset")
-    public ResponseEntity<?> mockReset() {
-        mockService.resetAll();
-        return ResponseEntity.ok(Map.of("ok", true));
-    }
-
-    @GetMapping("/trace/{id}")
-    public ResponseEntity<?> trace(@PathVariable String id) {
-        ExecutionTraceService.Trace t = traceService.get(id);
-        if (t==null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(t);
+    @PostMapping("/mock/reset") public Map<String, Object> reset() { mocks.resetAll(); return Map.of("ok", true); }
+    @GetMapping("/trace/{id}") public ResponseEntity<?> trace(@PathVariable String id) {
+        ExecutionTraceService.Trace trace = traces.get(id); return trace == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(trace);
     }
 }

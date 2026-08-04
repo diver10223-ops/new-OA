@@ -123,4 +123,13 @@ public class RegistryLoader {
     public Map<String, Object> getAll() {
         return registries;
     }
+
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> entries(String file, String key) {
+        Object registry = registries.get(file);
+        if (!(registry instanceof Map<?, ?> root) || !(root.get(key) instanceof List<?> values)) {
+            return List.of();
+        }
+        return (List<Map<String, Object>>) (List<?>) values;
+    }
 }

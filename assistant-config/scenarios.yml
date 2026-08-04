@@ -38,3 +38,13 @@ scenarios:
     skills: ["list_candidates"]
     template: candidate_list
     policies: ["org_view_policy"]
+
+  - id: indicator_default_prompt
+    name: 未识别指标-默认提示
+    intent: query_indicator
+    slots: ["org"]
+    domainType: analytics
+    mode: unsupported
+    skills: ["list_candidates"]
+    template: default_prompt
+    policies: ["org_view_policy"]
