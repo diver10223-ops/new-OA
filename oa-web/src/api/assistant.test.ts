@@ -66,7 +66,9 @@ describe('assistant API', () => {
   it('does not fallback for normal denied, unsupported, or error responses', async () => {
     for (const status of ['denied', 'unsupported', 'error'] as const) {
       post.mockResolvedValueOnce(assistantResponse(status))
-      await expect(executeAssistant({ text: status })).resolves.toMatchObject({ status, fallback: undefined })
+      const result = await executeAssistant({ text: status })
+      expect(result).toMatchObject({ status })
+      expect(result).not.toHaveProperty('fallback')
     }
   })
 

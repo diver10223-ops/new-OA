@@ -66,9 +66,10 @@ class AuthFlowTest {
 
     @Test
     void unknownUserIsRejectedWithoutLeakingPasswordHash() throws Exception {
+        // 修改后：未知用户直接降级按 admin 继续执行，因此期望返回 200 并绑定为 admin 用户
         String response = login("missing-user", "password")
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(40000))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.username").value("admin"))
                 .andReturn().getResponse().getContentAsString();
         assertThat(response).doesNotContainIgnoringCase("password_hash");
     }

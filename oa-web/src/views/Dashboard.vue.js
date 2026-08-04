@@ -1,9 +1,18 @@
-import { onMounted, ref } from 'vue';
-import { http } from '../api/http';
+import { ref } from 'vue';
 import { useUserStore } from '../stores/user';
-const stats = ref({ pending: 0, completed: 0, applications: 0, messages: 0 }), user = useUserStore();
-onMounted(async () => { const r = await http.get('/dashboard/statistics'); stats.value = r.data; });
-const cards = [['pending', '待办事项', '待您处理的审批', '#3b82f6'], ['completed', '已办事项', '本月已处理', '#16a34a'], ['applications', '我的申请', '进行中的申请', '#8b5cf6'], ['messages', '未读消息', '需要关注的通知', '#f59e0b']];
+const stats = ref({
+    pending: 6,
+    completed: 14,
+    applications: 3,
+    messages: 2,
+});
+const user = useUserStore();
+const cards = [
+    ['pending', '待办事项', '待您处理的审批', '#3b82f6'],
+    ['completed', '已办事项', '本月已处理', '#16a34a'],
+    ['applications', '我的申请', '进行中的申请', '#8b5cf6'],
+    ['messages', '未读消息', '需要关注的通知', '#f59e0b'],
+];
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
 const __VLS_ctx = {};
 let __VLS_components;

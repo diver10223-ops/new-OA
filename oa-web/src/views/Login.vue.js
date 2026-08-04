@@ -2,13 +2,16 @@ import { reactive, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useUserStore } from '../stores/user';
 const form = reactive({ username: 'admin', password: 'password' }), loading = ref(false), router = useRouter(), route = useRoute(), user = useUserStore();
-async function submit() { loading.value = true; try {
-    await user.login(form.username, form.password);
-    router.push(String(route.query.redirect || '/dashboard'));
+async function submit() {
+    loading.value = true;
+    try {
+        const home = await user.login(form.username, form.password);
+        router.push(String(route.query.redirect || home || '/dashboard'));
+    }
+    finally {
+        loading.value = false;
+    }
 }
-finally {
-    loading.value = false;
-} }
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
 const __VLS_ctx = {};
 let __VLS_components;

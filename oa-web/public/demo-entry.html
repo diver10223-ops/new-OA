@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>演示角色入口</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #f5f7fb 0%, #eef3ff 100%);
+      color: #1f2937;
+    }
+    .wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 720px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(37, 99, 235, 0.12);
+      padding: 32px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+    .desc {
+      margin: 0 0 24px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .role-btn {
+      border: 1px solid #dbeafe;
+      border-radius: 16px;
+      background: #f8fbff;
+      padding: 20px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .role-btn:hover {
+      transform: translateY(-2px);
+      border-color: #93c5fd;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+    }
+    .role-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .role-title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .role-text {
+      margin: 0;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .status {
+      margin-top: 20px;
+      min-height: 24px;
+      font-size: 14px;
+    }
+    .status.error { color: #dc2626; }
+    .status.ok { color: #059669; }
+    .tip {
+      margin-top: 20px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #f9fafb;
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .card { padding: 24px; }
+      h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>演示角色入口</h1>
+      <p class="desc">
+        点击角色直接进入系统，无需手动输入账号密码。
+        页面会自动调用登录接口，保存角色信息、认证状态和 Token。
+      </p>
+
+      <div class="grid">
+        <button class="role-btn" data-role="admin">
+          <div class="role-title">系统管理员</div>
+          <p class="role-text">进入首页：/dashboard</p>
+        </button>
+
+        <button class="role-btn" data-role="employee">
+          <div class="role-title">普通员工</div>
+          <p class="role-text">进入首页：/leave</p>
+        </button>
+
+        <button class="role-btn" data-role="manager">
+          <div class="role-title">部门经理</div>
+          <p class="role-text">进入首页：/approval/pending</p>
+        </button>
+
+        <button class="role-btn" data-role="project">
+          <div class="role-title">项目负责人</div>
+          <p class="role-text">进入首页：/project</p>
+        </button>
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div class="tip">
+        入口地址：<code>/demo-entry.html</code><br />
+        若现有前端已从 <code>localStorage.oa_token</code> 读取 Token，
+        后续访问接口时将自动携带认证信息。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const homeMap = {
+      admin: '/dashboard',
+      employee: '/leave',
+      manager: '/approval/pending',
+      project: '/project',
+    };
+
+    const roleMap = {
+      admin: { displayName: '系统管理员', roles: ['ADMIN'] },
+      employee: { displayName: '普通员工', roles: ['EMPLOYEE'] },
+      manager: { displayName: '部门经理', roles: ['MANAGER'] },
+      project: { displayName: '项目负责人', roles: ['PROJECT'] },
+    };
+
+    const buttons = Array.from(document.querySelectorAll('.role-btn'));
+    const statusEl = document.getElementById('status');
+
+    function setLoading(loading) {
+      buttons.forEach((btn) => { btn.disabled = loading; });
+    }
+
+    function setStatus(text, type) {
+      statusEl.textContent = text || '';
+      statusEl.className = 'status' + (type ? ' ' + type : '');
+    }
+
+    async function enter(role) {
+      setLoading(true);
+      setStatus('正在进入：' + role + ' ...');
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: role,
+            password: 'password'
+          })
+        });
+
+        let payload = null;
+        try {
+          payload = await response.json();
+        } catch (_) {
+          payload = null;
+        }
+
+        const token = payload && payload.data && payload.data.token
+          ? payload.data.token
+          : 'demo-' + role;
+
+        const username = payload && payload.data && payload.data.username
+          ? payload.data.username
+          : role;
+
+        const displayName = payload && payload.data && payload.data.displayName
+          ? payload.data.displayName
+          : roleMap[role].displayName;
+
+        const roles = payload && payload.data && payload.data.roles
+          ? payload.data.roles
+          : roleMap[role].roles;
+
+        if (!response.ok && response.status !== 200) {
+          throw new Error((payload && payload.message) || ('登录失败，HTTP ' + response.status));
+        }
+
+        localStorage.setItem('oa_token', token);
+        localStorage.setItem('oa_demo_user', JSON.stringify({
+          username,
+          displayName,
+          roles
+        }));
+        localStorage.setItem('oa_demo_auth', JSON.stringify({
+          authenticated: true,
+          status: 200,
+          username,
+          roles
+        }));
+
+        setStatus('进入成功，正在跳转...', 'ok');
+        location.href = homeMap[role];
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : '进入失败', 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => enter(btn.dataset.role));
+    });
+  </script>
+</body>
+</html>

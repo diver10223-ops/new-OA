@@ -1,17 +1,17 @@
-import {createRouter,createWebHistory} from 'vue-router';
-import Login from '../views/Login.vue';
-import Layout from '../layout/AppLayout.vue';
-import Dashboard from '../views/Dashboard.vue';
-import Forbidden from '../views/Forbidden.vue';
-import NotFound from '../views/NotFound.vue';
-import LeaveList from '../views/LeaveList.vue';
-import LeaveForm from '../views/LeaveForm.vue';
-import LeaveDetail from '../views/LeaveDetail.vue';
-import ApprovalTasks from '../views/ApprovalTasks.vue';
-import ProjectList from '../views/ProjectList.vue';
-import ProjectDetail from '../views/ProjectDetail.vue';
-import MyApplications from '../views/MyApplications.vue';
-import AskAnalytics from '../views/AskAnalytics.vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import Login from '../views/Login.vue'
+import Layout from '../layout/AppLayout.vue'
+import Dashboard from '../views/Dashboard.vue'
+import Forbidden from '../views/Forbidden.vue'
+import NotFound from '../views/NotFound.vue'
+import LeaveList from '../views/LeaveList.vue'
+import LeaveForm from '../views/LeaveForm.vue'
+import LeaveDetail from '../views/LeaveDetail.vue'
+import ApprovalTasks from '../views/ApprovalTasks.vue'
+import ProjectList from '../views/ProjectList.vue'
+import ProjectDetail from '../views/ProjectDetail.vue'
+import MyApplications from '../views/MyApplications.vue'
+import AskAnalytics from '../views/AskAnalytics.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -39,13 +39,33 @@ const router = createRouter({
     { path: '/403', component: Forbidden, meta: { public: true } },
     { path: '/:pathMatch(.*)*', component: NotFound, meta: { public: true } },
   ],
-});
+})
+
+const roleHomeMap: Record<string, string> = {
+  employee: '/leave',
+  branch: '/approval/pending',
+  head: '/dashboard',
+  business: '/project',
+  manager: '/approval/pending',
+  admin: '/dashboard',
+  project: '/project',
+}
 
 router.beforeEach((to) => {
-  if (to.path === '/login') {
-    return true;
-  }
-  return true;
-});
+  const token = localStorage.getItem('oa_token')
+  const savedRole = localStorage.getItem('oa_demo_role') || 'head'
+  const home = roleHomeMap[savedRole] || '/dashboard'
 
-export default router;
+  if (to.path === '/login') {
+    if (token) return home
+    return true
+  }
+
+  if (to.meta?.public) return true
+
+  if (!token) return '/login'
+
+  return true
+})
+
+export default router

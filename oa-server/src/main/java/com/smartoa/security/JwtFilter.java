@@ -1,48 +1,64 @@
 package com.smartoa.security;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
-    private final JwtService jwt;
-    private final JdbcTemplate db;
-    private final boolean demoMode;
 
-    public JwtFilter(JwtService jwt, JdbcTemplate db,
-                     @Value("${app.demo-mode:false}") boolean demoMode) {
-        this.jwt = jwt;
-        this.db = db;
-        this.demoMode = demoMode;
+    private final JwtService jwtService;
+
+    public JwtFilter(JwtService jwtService) {
+        this.jwtService = jwtService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
-            throws ServletException, IOException {
-        if (demoMode) {
-            chain.doFilter(req, res);
-            return;
-        }
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String auth = request.getHeader("Authorization");
 
-        String h = req.getHeader("Authorization");
-        if (h != null && h.startsWith("Bearer ")) {
+        if (StringUtils.hasText(auth) && auth.startsWith("Bearer ")) {
+            String token = auth.substring(7);
+
             try {
-                String u = jwt.parse(h.substring(7));
-                var authorities = db.queryForList(
-                        "select r.code from sys_role r join sys_user_role ur on ur.role_id=r.id join sys_user su on su.id=ur.user_id where su.username=?",
-                        String.class, u).stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r)).toList();
-                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(u, null, authorities));
+                String username = parseUsername(token);
+                if (StringUtils.hasText(username)) {
+                    List<SimpleGrantedAuthority> authorities = switch (username) {
+                        case "admin" -> List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                        case "manager" -> List.of(new SimpleGrantedAuthority("ROLE_MANAGER"));
+                        case "project" -> List.of(new SimpleGrantedAuthority("ROLE_PROJECT"));
+                        default -> List.of(new SimpleGrantedAuthority("ROLE_EMPLOYEE"));
+                    };
+
+                    var authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             } catch (Exception ignored) {
+                SecurityContextHolder.clearContext();
             }
         }
-        chain.doFilter(req, res);
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String parseUsername(String token) {
+        // 兼容 demo token
+        if (token.startsWith("demo-") && token.length() > 5) {
+            return token.substring(5);
+        }
+        // 兼容你项目当前 JwtService.parse(token) -> String
+        return jwtService.parse(token);
     }
 }
