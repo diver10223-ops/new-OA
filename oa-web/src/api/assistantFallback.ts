@@ -25,10 +25,22 @@ function makeResponse(request: AssistantExecuteRequest): AssistantExecuteRespons
 }
 
 function createTrace(text: string, response: AssistantExecuteResponse) {
-  const names = ['INPUT_RECEIVED', 'INTENT_MATCHED', 'SLOTS_EXTRACTED', 'SCENARIO_SELECTED', 'SKILL_EXECUTED', 'TEMPLATE_SELECTED', 'RESULT_CREATED']
-  const stages: ExecutionTraceEvent[] = names.map((stage, index) => ({ stage, at: new Date(Date.now() + index).toISOString(), details: index === 6 ? { status: response.status } : { source: 'local-demo' } }))
+  const events: Array<[string, Record<string, unknown>]> = [
+    ['INPUT_RECEIVED', { text }],
+    ['INTENT_MATCHED', { intent: response.intent, matchedRules: response.matchedRules }],
+    ['SLOTS_EXTRACTED', { slots: response.slots }],
+    ['SCENARIO_SELECTED', { scenario: response.scenario }],
+    ['SKILL_EXECUTED', { skills: ['local-demo-dataset'] }],
+    ['TEMPLATE_SELECTED', { template: response.template }],
+    ['RESULT_CREATED', { status: response.status }],
+  ]
+  const stages: ExecutionTraceEvent[] = events.map(([stage, details], index) => ({
+    stage,
+    at: new Date(Date.now() + index).toISOString(),
+    details,
+  }))
   traces.set(response.traceId, { id: response.traceId, created: new Date().toISOString(), text, stages, response })
 }
 
-export function executeAssistantFallback(request: AssistantExecuteRequest) { return Promise.resolve(makeResponse(request)) }
-export function getAssistantTraceFallback(traceId: string) { return Promise.resolve(traces.get(traceId) ?? null) }
+export function executeAssistantFallback(request: AssistantExecuteRequest): Promise<AssistantExecuteResponse> { return Promise.resolve(makeResponse(request)) }
+export function getAssistantTraceFallback(traceId: string): Promise<ExecutionTrace | null> { return Promise.resolve(traces.get(traceId) ?? null) }
