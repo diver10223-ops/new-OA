@@ -24,7 +24,7 @@ async function execute() {
   const question = text.value.trim()
   if (!question) { validation.value = '请输入问题后再查询'; return }
   if (loading.value) return
-  loading.value = true; validation.value = ''; requestError.value = ''; response.value = null; trace.value = null; traceOpen.value = false
+  loading.value = true; validation.value = ''; requestError.value = ''; response.value = null; trace.value = null; traceOpen.value = false; traceError.value = ''
   try { response.value = await executeAssistant({ text: question, ...(org.value.trim() ? { org: org.value.trim() } : {}) }) }
   catch { requestError.value = '请求失败，请稍后重试'; }
   finally { loading.value = false }

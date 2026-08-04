@@ -11,7 +11,11 @@ function isNetworkFailure(error: unknown): boolean {
 
 export async function executeAssistant(request: AssistantExecuteRequest): Promise<AssistantExecuteResponse> {
   try {
-    return await http.post('/assistant/execute', request, { headers: { 'X-User-Id': DEMO_USER_ID } }) as unknown as AssistantExecuteResponse
+    return await http.post<AssistantExecuteResponse, AssistantExecuteResponse, AssistantExecuteRequest>(
+      '/assistant/execute',
+      request,
+      { headers: { 'X-User-Id': DEMO_USER_ID } },
+    )
   } catch (error) {
     if (!isNetworkFailure(error)) throw error
     return executeAssistantFallback(request)
@@ -24,5 +28,7 @@ export async function getAssistantTrace(traceId: string): Promise<ExecutionTrace
     if (!trace) throw new Error('本地轨迹不存在')
     return trace
   }
-  return await http.get(`/assistant/trace/${encodeURIComponent(traceId)}`) as unknown as ExecutionTrace
+  return await http.get<ExecutionTrace, ExecutionTrace>(
+    `/assistant/trace/${encodeURIComponent(traceId)}`,
+  )
 }
