@@ -30,6 +30,9 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/ask-admin.html").permitAll()
+                        .requestMatchers("/api/admin/assistant-config/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/assistant/mock/reset").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
