@@ -1,0 +1,812 @@
+{
+  "version": "1.0",
+  "groups": [
+    {
+      "id": "overview",
+      "name": "运营总览",
+      "order": 10,
+      "items": [
+        {
+          "id": "dashboard",
+          "name": "运营概览",
+          "description": "查看配置资产、运行状态、发布待办和风险告警",
+          "order": 10,
+          "enabled": true,
+          "implementationStatus": "available",
+          "children": [
+            {
+              "id": "runtime-overview",
+              "name": "运行概览",
+              "pageType": "dashboard",
+              "capability": "summary",
+              "enabled": true,
+              "implementationStatus": "available"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "semantics",
+      "name": "语义与指标",
+      "order": 20,
+      "items": [
+        {
+          "id": "metrics",
+          "name": "指标管理",
+          "description": "维护指标定义、口径、维度与数据预览",
+          "order": 10,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "metric-definition",
+              "name": "指标定义",
+              "pageType": "metric-definition",
+              "capability": "config:mock",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "metric-alias",
+              "name": "指标别名",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "metric-caliber",
+              "name": "指标口径",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "metric-dimension",
+              "name": "指标维度",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "metric-relation",
+              "name": "指标关系",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "metric-preview",
+              "name": "指标数据预览",
+              "pageType": "metric-preview",
+              "capability": "config:mock",
+              "enabled": true,
+              "implementationStatus": "available"
+            }
+          ]
+        },
+        {
+          "id": "intents",
+          "name": "问法与意图管理",
+          "description": "维护用户问法、意图、关键词和槽位",
+          "order": 20,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "intent-definition",
+              "name": "意图定义",
+              "pageType": "intent-definition",
+              "capability": "config:intents",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "training-utterance",
+              "name": "训练问法",
+              "pageType": "training-utterance",
+              "capability": "config:intents",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "keyword-weight",
+              "name": "关键词与权重",
+              "pageType": "planned",
+              "capability": "config:intents",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "slot-definition",
+              "name": "槽位定义",
+              "pageType": "planned",
+              "capability": "config:scenarios",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "normalization-dictionary",
+              "name": "标准化词典",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "conflict-diagnosis",
+              "name": "冲突诊断",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "orchestration",
+      "name": "编排与执行",
+      "order": 30,
+      "items": [
+        {
+          "id": "scenarios",
+          "name": "场景编排管理",
+          "description": "维护意图到 Skill、模板和策略的执行编排",
+          "order": 10,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "scenario-definition",
+              "name": "场景定义",
+              "pageType": "scenario-definition",
+              "capability": "config:scenarios",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "flow-orchestration",
+              "name": "流程编排",
+              "pageType": "planned",
+              "capability": "config:scenarios",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "routing-rules",
+              "name": "路由规则",
+              "pageType": "planned",
+              "capability": "config:scenarios",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "exception-branches",
+              "name": "异常分支",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "scenario-simulation",
+              "name": "场景模拟",
+              "pageType": "scenario-simulation",
+              "capability": "assistant-execute",
+              "enabled": true,
+              "implementationStatus": "available"
+            }
+          ]
+        },
+        {
+          "id": "skills",
+          "name": "Skill 管理",
+          "description": "注册受控 Skill 并查看场景引用",
+          "order": 20,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "skill-registry",
+              "name": "Skill 注册",
+              "pageType": "skill-registry",
+              "capability": "config:skills",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "skill-schema",
+              "name": "输入输出 Schema",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "skill-data-source",
+              "name": "数据源绑定",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "skill-online-test",
+              "name": "在线测试",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "write-security",
+              "name": "写操作安全",
+              "pageType": "planned",
+              "capability": "config:skills",
+              "enabled": true,
+              "implementationStatus": "partial"
+            }
+          ]
+        },
+        {
+          "id": "templates",
+          "name": "输出模板管理",
+          "description": "维护安全的文本结果模板",
+          "order": 30,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "result-template",
+              "name": "结果模板",
+              "pageType": "output-template",
+              "capability": "config:templates",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "chart-components",
+              "name": "图表组件",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "field-binding",
+              "name": "字段绑定",
+              "pageType": "planned",
+              "capability": "config:templates",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "empty-template",
+              "name": "空数据模板",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "error-template",
+              "name": "错误提示模板",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "confirmation-card",
+              "name": "确认卡模板",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "model-data-security",
+      "name": "模型、数据与安全",
+      "order": 40,
+      "items": [
+        {
+          "id": "models",
+          "name": "大模型管理",
+          "description": "管理模型接入、路由、约束和降级",
+          "order": 10,
+          "enabled": true,
+          "implementationStatus": "planned",
+          "children": [
+            {
+              "id": "model-registry",
+              "name": "模型注册",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "model-routing",
+              "name": "模型路由",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "dsl-constraints",
+              "name": "DSL 输出约束",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "fallback-strategy",
+              "name": "降级策略",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "model-statistics",
+              "name": "调用统计",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            }
+          ]
+        },
+        {
+          "id": "data-sources",
+          "name": "数据源管理",
+          "description": "管理数据源、映射和运行保护",
+          "order": 20,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "data-source-definition",
+              "name": "数据源定义",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "connection-status",
+              "name": "连接状态",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "metric-mapping",
+              "name": "指标映射",
+              "pageType": "planned",
+              "capability": "config:mock",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "skill-mapping",
+              "name": "Skill 映射",
+              "pageType": "planned",
+              "capability": "config:skills",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "field-mapping",
+              "name": "字段映射",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "cache-circuit-breaker",
+              "name": "缓存与熔断",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "data-call-preview",
+              "name": "数据调用预览",
+              "pageType": "metric-preview",
+              "capability": "config:mock",
+              "enabled": true,
+              "implementationStatus": "partial"
+            }
+          ]
+        },
+        {
+          "id": "permissions",
+          "name": "权限与数据范围管理",
+          "description": "管理功能和数据范围策略",
+          "order": 30,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "function-permission",
+              "name": "功能权限",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "metric-permission",
+              "name": "指标权限",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "org-scope",
+              "name": "机构范围",
+              "pageType": "planned",
+              "capability": "config:policies",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "row-permission",
+              "name": "行级权限",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "field-masking",
+              "name": "字段脱敏",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "policy-simulation",
+              "name": "策略模拟",
+              "pageType": "policy-simulation",
+              "capability": "config:policies",
+              "enabled": true,
+              "implementationStatus": "available"
+            }
+          ]
+        },
+        {
+          "id": "demo",
+          "name": "演示用户与机构管理",
+          "description": "维护演示用户、机构与 Mock 数据",
+          "order": 40,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "demo-users",
+              "name": "演示用户",
+              "pageType": "demo-user",
+              "capability": "config:mock",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "demo-orgs",
+              "name": "演示机构",
+              "pageType": "demo-user",
+              "capability": "config:mock",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "mock-data",
+              "name": "Mock 数据",
+              "pageType": "mock-data",
+              "capability": "config:mock",
+              "enabled": true,
+              "implementationStatus": "available"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "operations",
+      "name": "测试、发布与运维",
+      "order": 50,
+      "items": [
+        {
+          "id": "evaluation",
+          "name": "测试集与效果评测",
+          "description": "建设测试集、回放和回归评测",
+          "order": 10,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "test-set",
+              "name": "测试集",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "single-debug",
+              "name": "单条调试",
+              "pageType": "scenario-simulation",
+              "capability": "assistant-execute",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "batch-replay",
+              "name": "批量回放",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "model-rule-compare",
+              "name": "模型/规则对比",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "regression-results",
+              "name": "回归结果",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "failed-cases",
+              "name": "失败案例",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            }
+          ]
+        },
+        {
+          "id": "troubleshooting",
+          "name": "执行轨迹与问题排查",
+          "description": "查询执行轨迹并定位运行问题",
+          "order": 20,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "trace-query",
+              "name": "Trace 查询",
+              "pageType": "scenario-simulation",
+              "capability": "assistant-trace",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "failed-requests",
+              "name": "失败请求",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "slow-requests",
+              "name": "慢请求",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "permission-denials",
+              "name": "权限拒绝",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "dsl-compare",
+              "name": "DSL 对比",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "data-source-calls",
+              "name": "数据源调用",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            }
+          ]
+        },
+        {
+          "id": "release",
+          "name": "配置发布与版本管理",
+          "description": "管理草稿、校验、发布与回滚",
+          "order": 30,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "my-drafts",
+              "name": "我的草稿",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "change-set",
+              "name": "变更集",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "reference-validation",
+              "name": "全量关联校验",
+              "pageType": "reference-validation",
+              "capability": "references",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "impact-analysis",
+              "name": "影响分析",
+              "pageType": "planned",
+              "capability": "references",
+              "enabled": true,
+              "implementationStatus": "partial"
+            },
+            {
+              "id": "release-approval",
+              "name": "发布审批",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "release-records",
+              "name": "发布记录",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "version-compare",
+              "name": "版本对比",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "rollback",
+              "name": "回滚",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            }
+          ]
+        },
+        {
+          "id": "system",
+          "name": "系统运行与审计管理",
+          "description": "查看配置加载状态与规划中的运行审计能力",
+          "order": 40,
+          "enabled": true,
+          "implementationStatus": "partial",
+          "children": [
+            {
+              "id": "service-health",
+              "name": "服务健康",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "config-load-status",
+              "name": "配置加载状态",
+              "pageType": "runtime-config",
+              "capability": "summary",
+              "enabled": true,
+              "implementationStatus": "available"
+            },
+            {
+              "id": "model-call-statistics",
+              "name": "模型调用统计",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "skill-call-statistics",
+              "name": "Skill 调用统计",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "data-source-status",
+              "name": "数据源状态",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "config-audit",
+              "name": "配置操作审计",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "sensitive-query-audit",
+              "name": "敏感查询审计",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "security-events",
+              "name": "安全事件",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            },
+            {
+              "id": "alert-rules",
+              "name": "告警规则",
+              "pageType": "planned",
+              "capability": "none",
+              "enabled": true,
+              "implementationStatus": "planned"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
