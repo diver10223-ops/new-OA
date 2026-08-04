@@ -9,6 +9,16 @@ skills:
     type: read
     description: 针对歧义问题返回候选项
 
+  - id: compare_indicator
+    name: 比较指标
+    type: read
+    description: 读取指标当前值和对比值并计算变化
+
+  - id: read_trend
+    name: 读取趋势
+    type: read
+    description: 按机构读取指标的时间序列
+
   - id: derived_calc
     name: 衍生计算
     type: read

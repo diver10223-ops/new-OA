@@ -1,22 +1,24 @@
 intents:
-  - id: query_deposit_balance
-    name: 查询存款余额
+  - id: query_indicator
+    name: 查询指标
     examples:
-      - "本月本分行存款余额"
-      - "本分行存款余额是多少"
-      - "今天我们分行的存款余额"
-    synonyms: ["存款余额", "存款总额", "存款盘子"]
+      - "本月本分行存款余额是多少"
+      - "查询总部平均存款"
+      - "现在的贷款占比是多少"
+    keywords: ["查询", "多少", "当前", "余额", "平均存款", "贷款占比"]
 
-  - id: query_avg_deposit
-    name: 查询日均存款
+  - id: compare_indicator
+    name: 比较指标
     examples:
-      - "本月日均存款余额"
-      - "日均存款"
-    synonyms: ["日均存款", "平均存款"]
+      - "存款余额比上期增加了多少"
+      - "比较总部和分行的平均存款"
+      - "贷款占比较上月有什么变化"
+    keywords: ["比较", "对比", "比上期", "较上月", "增加", "减少"]
 
-  - id: query_loan_deposit_ratio
-    name: 查询存贷比
+  - id: trend_indicator
+    name: 趋势查询
     examples:
-      - "本月存贷比"
-      - "存贷比是多少"
-    synonyms: ["存贷比", "贷款存款比"]
+      - "查看近三个月存款余额趋势"
+      - "平均存款最近走势如何"
+      - "贷款占比的历史变化"
+    keywords: ["趋势", "走势", "历史", "近三个月", "变化曲线", "时间序列"]
