@@ -1,0 +1,8 @@
+import { describe, expect, it } from 'vitest'
+import { mount } from '@vue/test-utils'
+import IndicatorCard from './IndicatorCard.vue'
+import TraceDrawer from './TraceDrawer.vue'
+describe('assistant result components', () => {
+  it('renders query, compare and ordered trend without mutation', () => { expect(mount(IndicatorCard, { props: { data: { indicator: '存款余额', org: '分行', value: 10 } } }).text()).toContain('10'); expect(mount(IndicatorCard, { props: { data: { indicator: '平均存款', org: '总部', current: 12, previous: 10, difference: 2, changeRate: .2 } } }).text()).toContain('20.00%'); const data = { indicator: '贷款占比', org: '分行', trend: [{ period: '五月', value: .5 }, { period: '六月', value: .55 }] }; const wrapper = mount(IndicatorCard, { props: { data } }); expect(wrapper.text().indexOf('五月')).toBeLessThan(wrapper.text().indexOf('六月')); expect(wrapper.text()).toContain('55.00%'); expect(data.trend[1].value).toBe(.55) })
+  it('renders seven ordered stages and unknown stages', () => { const stages = ['INPUT_RECEIVED', 'INTENT_MATCHED', 'SLOTS_EXTRACTED', 'SCENARIO_SELECTED', 'SKILL_EXECUTED', 'TEMPLATE_SELECTED', 'RESULT_CREATED', 'FUTURE_STAGE'].map(stage => ({ stage, at: '2026', details: {} })); const wrapper = mount(TraceDrawer, { props: { open: true, trace: { id: '1', created: '', text: '', stages } }, global: { stubs: { ElDrawer: { template: '<div><slot name="title"/><slot/></div>' }, ElTimeline: { template: '<div><slot/></div>' }, ElTimelineItem: { template: '<div><slot/></div>' } } } }); const content = wrapper.text(); expect(['接收输入','匹配意图','提取槽位','选择场景','执行技能','选择模板','生成结果'].every(x => content.includes(x))).toBe(true); expect(content).toContain('FUTURE_STAGE') })
+})

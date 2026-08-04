@@ -11,6 +11,7 @@ import ApprovalTasks from '../views/ApprovalTasks.vue';
 import ProjectList from '../views/ProjectList.vue';
 import ProjectDetail from '../views/ProjectDetail.vue';
 import MyApplications from '../views/MyApplications.vue';
+import AskAnalytics from '../views/AskAnalytics.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -32,6 +33,7 @@ const router = createRouter({
         { path: 'leave/:id', component: LeaveDetail },
         { path: 'project', component: ProjectList },
         { path: 'project/:id', component: ProjectDetail },
+        { path: 'ask', component: AskAnalytics },
       ],
     },
     { path: '/403', component: Forbidden, meta: { public: true } },
