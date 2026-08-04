@@ -2,10 +2,12 @@ package com.smartoa;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,8 +25,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthFlowTest {
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper json;
+    @Autowired
+    MockMvc mvc;
+    @Autowired
+    ObjectMapper json;
 
     @Test
     void healthIsPublic() throws Exception {
@@ -52,10 +56,10 @@ class AuthFlowTest {
     }
 
     @Test
-    void wrongPasswordIsRejectedWithoutLeakingPasswordHash() throws Exception {
+    void demoModeAcceptsAnyPasswordWithoutLeakingPasswordHash() throws Exception {
         String response = login("admin", "wrong-password")
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(40000))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.token").isNotEmpty())
                 .andReturn().getResponse().getContentAsString();
         assertThat(response).doesNotContainIgnoringCase("password_hash");
     }

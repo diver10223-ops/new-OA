@@ -1,3 +1,49 @@
 package com.smartoa.security;
-import org.springframework.context.annotation.*; import org.springframework.http.HttpStatus; import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity; import org.springframework.security.config.annotation.web.builders.HttpSecurity; import org.springframework.security.config.http.SessionCreationPolicy; import org.springframework.security.crypto.bcrypt.*; import org.springframework.security.crypto.password.PasswordEncoder; import org.springframework.security.web.*; import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-@Configuration @EnableMethodSecurity public class SecurityConfig { @Bean PasswordEncoder encoder(){return new BCryptPasswordEncoder();} @Bean SecurityFilterChain chain(HttpSecurity h,JwtFilter f)throws Exception{return h.csrf(c->c.disable()).cors(c->{}).sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authorizeHttpRequests(a->a.requestMatchers("/api/auth/login","/api/health","/actuator/health","/swagger-ui/**","/v3/api-docs/**","/h2-console/**").permitAll().anyRequest().authenticated()).headers(x->x.frameOptions(y->y.sameOrigin())).exceptionHandling(e->e.authenticationEntryPoint((q,r,z)->{r.setStatus(HttpStatus.UNAUTHORIZED.value());r.setContentType("application/json;charset=UTF-8");r.getWriter().write("{\"code\":40100,\"message\":\"未登录或登录已过期\",\"data\":null}");}).accessDeniedHandler((q,r,z)->{r.setStatus(403);r.setContentType("application/json;charset=UTF-8");r.getWriter().write("{\"code\":40300,\"message\":\"无权执行该操作\",\"data\":null}");})).addFilterBefore(f,UsernamePasswordAuthenticationFilter.class).build();}}
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.*;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfig {
+    @Bean
+    PasswordEncoder encoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    SecurityFilterChain chain(HttpSecurity h, JwtFilter f,
+                              @Value("${app.demo-mode:false}") boolean demoMode) throws Exception {
+        h.csrf(c -> c.disable())
+                .cors(c -> {})
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(a -> {
+                    if (demoMode) {
+                        a.anyRequest().permitAll();
+                    } else {
+                        a.requestMatchers("/api/auth/login", "/api/health", "/actuator/health", "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**")
+                                .permitAll()
+                                .anyRequest().authenticated();
+                    }
+                })
+                .headers(x -> x.frameOptions(y -> y.sameOrigin()))
+                .exceptionHandling(e -> e.authenticationEntryPoint((q, r, z) -> {
+                    r.setStatus(HttpStatus.UNAUTHORIZED.value());
+                    r.setContentType("application/json;charset=UTF-8");
+                    r.getWriter().write("{\"code\":40100,\"message\":\"未登录或登录已过期\",\"data\":null}");
+                }).accessDeniedHandler((q, r, z) -> {
+                    r.setStatus(403);
+                    r.setContentType("application/json;charset=UTF-8");
+                    r.getWriter().write("{\"code\":40300,\"message\":\"无权执行该操作\",\"data\":null}");
+                }))
+                .addFilterBefore(f, UsernamePasswordAuthenticationFilter.class);
+        return h.build();
+    }
+}
